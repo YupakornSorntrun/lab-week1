@@ -8,7 +8,7 @@ let students = [
 let nextId = 3;
 
 /* 1. GET: ดึงรายการนักศึกษาทั้งหมด
-    รองรับการกรองข้อมูลตาม major ผ่าน query string
+    - รองรับการกรองข้อมูลตาม major ผ่าน query string
     เช่น /students?major=วิทยาการคอมพิวเตอร์ */
 router.get("/", (req, res) => {
   const { major } = req.query;
@@ -34,16 +34,26 @@ router.get("/:id", (req, res) => {
   res.status(200).json({ message: "สำเร็จ", data: student });
 });
 
-// 3. POST: เพิ่มข้อมูลนักศึกษาใหม่
+/* 3. POST: เพิ่มข้อมูลนักศึกษาใหม่
+    - ตรวจสอบ name ต้องเป็นข้อความที่มีความยาวอย่างน้อย 2 ตัวอักษร
+    - ถ้ามีนักศึกษาชื่อซ้ำกับข้อมูลที่มีอยู่แล้ว ให้ตอบกลับด้วย Status Code 409 (Conflict) พร้อมข้อความแจ้งเตือน
+*/
 router.post("/", (req, res) => {
   const { name, major } = req.body;
 
-  if (!name || !major) {
+  if (!name || name.length < 2) {
     return res
       .status(400)
-      .json({ message: "กรุณาระบุ name และ major ให้ครบถ้วน" });
+      .json({ message: "ชื่อต้องมีความยาวอย่างน้อย 2 ตัวอักษร" });
   }
 
+  if (!major) {
+    return res.status(400).json({ message: "กรุณาระบุ major ให้ครบถ้วน" });
+  }
+  const checkStudent = students.find((s) => s.name === name);
+  if (checkStudent) {
+    return res.status(409).json({ message: "นักศึกษาชื่อนี้มีอยู่แล้ว" });
+  }
   const newStudent = { id: nextId++, name, major };
   students.push(newStudent);
 
@@ -60,10 +70,19 @@ router.put("/:id", (req, res) => {
     return res.status(404).json({ message: "ไม่พบข้อมูลนักศึกษา" });
   }
 
-  if (!name || !major) {
+  if (!name || name.length < 2) {
     return res
       .status(400)
-      .json({ message: "กรุณาระบุ name และ major ให้ครบถ้วน" });
+      .json({ message: "ชื่อต้องมีความยาวอย่างน้อย 2 ตัวอักษร" });
+  }
+
+  if (!major) {
+    return res.status(400).json({ message: "กรุณาระบุ major ให้ครบถ้วน" });
+  }
+
+  const checkStudent = students.find((s) => s.name === name);
+  if (checkStudent) {
+    return res.status(409).json({ message: "นักศึกษาชื่อนี้มีอยู่แล้ว" });
   }
 
   student.name = name;
