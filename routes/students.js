@@ -7,8 +7,18 @@ let students = [
 ];
 let nextId = 3;
 
-// 1. GET: ดึงรายการนักศึกษาทั้งหมด
+/* 1. GET: ดึงรายการนักศึกษาทั้งหมด
+    รองรับการกรองข้อมูลตาม major ผ่าน query string
+    เช่น /students?major=วิทยาการคอมพิวเตอร์ */
 router.get("/", (req, res) => {
+  const { major } = req.query;
+  let filteredStudents = students;
+
+  if (major) {
+    filteredStudents = students.filter((s) => s.major === major);
+    res.status(200).json({ message: "สำเร็จ", data: filteredStudents });
+  }
+
   res.status(200).json({ message: "สำเร็จ", data: students });
 });
 
