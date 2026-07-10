@@ -50,7 +50,10 @@ router.post("/", (req, res) => {
   if (!major) {
     return res.status(400).json({ message: "กรุณาระบุ major ให้ครบถ้วน" });
   }
+  
   const checkStudent = students.find((s) => s.name === name);
+
+  
   if (checkStudent) {
     return res.status(409).json({ message: "นักศึกษาชื่อนี้มีอยู่แล้ว" });
   }
@@ -70,17 +73,20 @@ router.put("/:id", (req, res) => {
     return res.status(404).json({ message: "ไม่พบข้อมูลนักศึกษา" });
   }
 
-  if (!name || name.length < 2) {
+  if (!name || !major) {
     return res
-      .status(400)
-      .json({ message: "ชื่อต้องมีความยาวอย่างน้อย 2 ตัวอักษร" });
+    .status(400)
+    .status(400).json({ message: "กรุณาระบุ major ให้ครบถ้วน" });
   }
 
-  if (!major) {
-    return res.status(400).json({ message: "กรุณาระบุ major ให้ครบถ้วน" });
-  }
+  /* ถ้ามีชื่อในidหนึ่ง แล้วจะเพิ่มชื่อเหมือนกัน จะขึ้นแจ้งเตือนว่ามีชื่อนี้แล้ว
+    และ ถ้าชื่อคนนั้น id ไม่เท่ากับ id ที่จะแก้ จะขึ้นแจ้งเตือนว่ามีชื่อนี้แล้ว
 
-  const checkStudent = students.find((s) => s.name === name);
+    เช่น id:1 name:สมชาย แล้ว id ที่จะแก้เป็น id:3 name:สมชาย (แจ้ง409)
+
+  */
+  const checkStudent = students.find((s) => s.name === name && s.id !== id);
+
   if (checkStudent) {
     return res.status(409).json({ message: "นักศึกษาชื่อนี้มีอยู่แล้ว" });
   }
