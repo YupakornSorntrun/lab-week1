@@ -2,14 +2,29 @@ const express = require("express");
 const router = express.Router();
 
 let students = [
-  { id: 1, name: "สมชาย ใจดี", major: "วิทยาการคอมพิวเตอร์" },
-  { id: 2, name: "สมหญิง รักเรียน", major: "เทคโนโลยีสารสนเทศ" },
+  {
+    id: 1,
+    name: "สมชาย ใจดี",
+    major: "วิทยาการคอมพิวเตอร์",
+    email: "somchai@example.com",
+    phone: "080-000-0001",
+    courseIds: [101, 102],
+  },
+  {
+    id: 2,
+    name: "สมหญิง รักเรียน",
+    major: "เทคโนโลยีสารสนเทศ",
+    email: "somying@example.com",
+    phone: "080-000-0002",
+    courseIds: [102],
+  },
 ];
-let nextId = 3;
+
 
 /* 1. GET: ดึงรายการนักศึกษาทั้งหมด
     - รองรับการกรองข้อมูลตาม major ผ่าน query string
     เช่น /students?major=วิทยาการคอมพิวเตอร์ */
+
 router.get("/", (req, res) => {
   const { major } = req.query;
   let filteredStudents = students;
@@ -33,6 +48,29 @@ router.get("/:id", (req, res) => {
 
   res.status(200).json({ message: "สำเร็จ", data: student });
 });
+
+// 2.2 GET: ดึงข้อมูลนักศึกษาทั้งหมด
+router.get(":id/full", (req, res) => {
+  const id = Number(req.params.id);
+  //คำสั่ง find = เป็น array ส่งมาทีละตัว
+  const student = students.find((s) => s.id === id);
+
+  if (!student) {
+    return res.status(404).json({ message: "ไม่พบข้อมูลนักศึกษา" });
+  }
+
+  //คำสั่ง filter = เป็น array วนลูปทุกตัว กรองข้อมูล เงื่อนไขจริงส่งตัวนั้นกลับมา
+  const studentCourses = courses.filter((c) =>
+    student.courseIds.includes(c.id), //id=101 includes เอาไอดีจาก courseIds มาตรวจดูใน courses ว่ามีไหมเป็นจริงส่งข้อมูลกลับ
+  );
+
+  res.status(200).json({
+    message: "สำเร็จ",
+    //...student = กระจายทุก attibute ใน student ออกมา
+    data: { ...student, courses: studentCourses },
+  });
+});
+
 
 /* 3. POST: เพิ่มข้อมูลนักศึกษาใหม่
     - ตรวจสอบ name ต้องเป็นข้อความที่มีความยาวอย่างน้อย 2 ตัวอักษร

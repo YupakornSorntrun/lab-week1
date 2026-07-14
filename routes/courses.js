@@ -2,10 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 let courses = [
-  { id: 1, code: "CS101", name: "วิทยาการคอมพิวเตอร์" },
-  { id: 2, code: "IT201", name: "เทคโนโลยีสารสนเทศ" },
+  { id: 101, courseName: "การเขียนโปรแกรมเบื้องต้น", credit: 3 },
+  { id: 102, courseName: "โครงสร้างข้อมูล", credit: 3 },
 ];
-let nextId = 3;
 
 // 1. GET: ดึงรายการรายวิชาทั้งหมด
 router.get("/", (req, res) => {
@@ -13,6 +12,7 @@ router.get("/", (req, res) => {
 });
 
 // 2. GET: ดึงข้อมูลรายวิชาตาม id
+
 router.get("/:id", (req, res) => {
   const id = Number(req.params.id);
   const course = courses.find((c) => c.id === id);
@@ -28,6 +28,7 @@ router.get("/:id", (req, res) => {
 
   res.status(200).json({ message: "สำเร็จ", data: course });
 });
+
 
 // 3. POST: เพิ่มข้อมูลรายวิชาใหม่
 router.post("/", (req, res) => {
