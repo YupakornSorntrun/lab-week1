@@ -1,24 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-let students = [
-  {
-    id: 1,
-    name: "สมชาย ใจดี",
-    major: "วิทยาการคอมพิวเตอร์",
-    email: "somchai@example.com",
-    phone: "080-000-0001",
-    courseIds: [101, 102],
-  },
-  {
-    id: 2,
-    name: "สมหญิง รักเรียน",
-    major: "เทคโนโลยีสารสนเทศ",
-    email: "somying@example.com",
-    phone: "080-000-0002",
-    courseIds: [102],
-  },
-];
+//ใช้ข้อมูลจากไฟล์ใน data
+const students = require("../data/studentsData") // ตรง ../ --> ย้อนออกไป 1 ชั้นก่อน
+const courses = require("../data/coursesData")
+
+let nextId = 3;
 
 
 /* 1. GET: ดึงรายการนักศึกษาทั้งหมด
@@ -50,7 +37,7 @@ router.get("/:id", (req, res) => {
 });
 
 // 2.2 GET: ดึงข้อมูลนักศึกษาทั้งหมด
-router.get(":id/full", (req, res) => {
+router.get("/:id/full", (req, res) => {
   const id = Number(req.params.id);
   //คำสั่ง find = เป็น array ส่งมาทีละตัว
   const student = students.find((s) => s.id === id);

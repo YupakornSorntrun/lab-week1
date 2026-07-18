@@ -18,14 +18,13 @@ app.use(
   }),
 );
 
+app.use("/api/v1/students", studentsRouter);
+app.use("/api/v1/courses", coursesRouter);
+
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Student API พร้อมใช้งาน" });
 });
 
-
-
-app.use("/api/v1/students", studentsRouter);
-app.use("/api/v1/courses", coursesRouter);
 
 app.listen(PORT, () => {
   console.log(`Server กำลังทำงานที่ http://localhost:${PORT}`);
