@@ -3,7 +3,7 @@ const router = express.Router();
 
 const courses = require("../data/coursesData")
 
-let nextId = 3;
+let nextId = 103;
 
 // 1. GET: ดึงรายการรายวิชาทั้งหมด
 router.get("/", (req, res) => {
@@ -31,15 +31,15 @@ router.get("/:id", (req, res) => {
 
 // 3. POST: เพิ่มข้อมูลรายวิชาใหม่
 router.post("/", (req, res) => {
-  const { code, name } = req.body;
+  const { courseName, credit } = req.body;
 
-  if (!code || !name) {
+  if (!courseName || !credit) {
     return res
       .status(400)
-      .json({ message: "กรุณาระบุ code และ name ให้ครบถ้วน" });
+      .json({ message: "กรุณาระบุ courseName และ credit ให้ครบถ้วน" });
   }
 
-  const newCourse = { id: nextId++, code, name };
+  const newCourse = { id: nextId++, courseName, credit };
   courses.push(newCourse);
 
   res.status(201).json({ message: "เพิ่มข้อมูลสำเร็จ", data: newCourse });
@@ -48,21 +48,21 @@ router.post("/", (req, res) => {
 // 4. PUT: แก้ไขข้อมูลรายวิชาทั้งระเบียน
 router.put("/:id", (req, res) => {
   const id = Number(req.params.id);
-  const { code, name } = req.body;
+  const { courseName, credit } = req.body;
   const course = courses.find((c) => c.id === id);
 
   if (!course) {
     return res.status(404).json({ message: "ไม่พบข้อมูลรายวิชา" });
   }
 
-  if (!code || !name) {
+  if (!courseName || !credit) {
     return res
       .status(400)
-      .json({ message: "กรุณาระบุ code และ name ให้ครบถ้วน" });
+      .json({ message: "กรุณาระบุ courseName และ credit ให้ครบถ้วน" });
   }
 
-  course.code = code;
-  course.name = name;
+  course.courseName = courseName;
+  course.credit = credit;
 
   res.status(200).json({ message: "แก้ไขข้อมูลสำเร็จ", data: course });
 });
