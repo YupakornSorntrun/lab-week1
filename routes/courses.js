@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const sendError = require("../sendError"); // นำเข้าโมดูล sendError
 
 const courses = require("../data/coursesData")
 
@@ -22,7 +23,8 @@ router.get("/:id", (req, res) => {
     โดยใช้ตัวดำเนินการเปรียบเทียบแบบเข้มงวด (strict equality operator) ซึ่งจะคืนค่า true หากทั้งสองค่าตรงกันและมีชนิดข้อมูลเดียวกัน*/
 
   if (!course) {
-    return res.status(404).json({ message: "ไม่พบข้อมูลรายวิชา" });
+    // ใช้ sendError แทน res.status().json()
+    return sendError(res, 404, "COURSE_NOT_FOUND", "ไม่พบข้อมูลรายวิชา");
   }
 
   res.status(200).json({ message: "สำเร็จ", data: course });
@@ -34,9 +36,7 @@ router.post("/", (req, res) => {
   const { courseName, credit } = req.body;
 
   if (!courseName || !credit) {
-    return res
-      .status(400)
-      .json({ message: "กรุณาระบุ courseName และ credit ให้ครบถ้วน" });
+    return sendError(res, 400, "VALIDATION_ERROR", "กรุณาระบุ courseName และ credit ให้ครบถ้วน");
   }
 
   const newCourse = { id: nextId++, courseName, credit };
@@ -52,13 +52,11 @@ router.put("/:id", (req, res) => {
   const course = courses.find((c) => c.id === id);
 
   if (!course) {
-    return res.status(404).json({ message: "ไม่พบข้อมูลรายวิชา" });
+    return sendError(res, 404, "COURSE_NOT_FOUND", "ไม่พบข้อมูลรายวิชา");
   }
 
   if (!courseName || !credit) {
-    return res
-      .status(400)
-      .json({ message: "กรุณาระบุ courseName และ credit ให้ครบถ้วน" });
+    return sendError(res, 400, "VALIDATION_ERROR", "กรุณาระบุ courseName และ credit ให้ครบถ้วน");
   }
 
   course.courseName = courseName;
@@ -73,7 +71,7 @@ router.delete("/:id", (req, res) => {
   const index = courses.findIndex((c) => c.id === id);
 
   if (index === -1) {
-    return res.status(404).json({ message: "ไม่พบข้อมูลรายวิชา" });
+    return sendError(res, 404, "COURSE_NOT_FOUND", "ไม่พบข้อมูลรายวิชา");
   }
 
   courses.splice(index, 1);

@@ -1,6 +1,7 @@
 const express = require("express");
 const studentsRouter = require("./routes/students");
 const coursesRouter = require("./routes/courses");
+const enrollmentsRouter = require("./routes/enrollments");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const { graphqlHTTP } = require("express-graphql");
@@ -20,6 +21,7 @@ app.use(
 
 app.use("/api/v1/students", studentsRouter);
 app.use("/api/v1/courses", coursesRouter);
+app.use("/api/v1", enrollmentsRouter);
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Student API พร้อมใช้งาน" });

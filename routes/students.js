@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const sendError = require("../sendError"); // นำเข้าโมดูล sendError
 
 //ใช้ข้อมูลจากไฟล์ใน data
 const students = require("../data/studentsData") // ตรง ../ --> ย้อนออกไป 1 ชั้นก่อน
@@ -32,7 +33,8 @@ router.get("/:id", (req, res) => {
   const student = students.find((s) => s.id === id);
 
     if (!student) {
-    return res.status(404).json({ message: "ไม่พบข้อมูลนักศึกษา" });
+    // ใช้ sendError แทน res.status().json()
+    return sendError(res, 404, "STUDENT_NOT_FOUND", "ไม่พบข้อมูลนักศึกษา");
   }
 
   // ตรวจสอบว่าต้องการแนบข้อมูลรายวิชาหรือไม่
@@ -65,34 +67,25 @@ router.post("/", (req, res) => {
   const { name, major, email } = req.body;
 
   if (!name || !major || !email) {
-    return res.status(400).json({
-      error: {
-        code: "VALIDATION_ERROR",
-        message: "กรุณาระบุ name, major และ email ให้ครบถ้วน",
-      },
-    });
+    return sendError(res, 400, "VALIDATION_ERROR", "กรุณาระบุ name, major และ email ให้ครบถ้วน")
+
   }
 
    if (!name || name.length < 2) {
-    return res
-      .status(400)
-      .json({ message: "ชื่อต้องมีความยาวอย่างน้อย 2 ตัวอักษร" });
+    return sendError(res, 400, "VALIDATION_ERROR", "กรุณาระบุ name อย่างน้อย 2 ตัวอักษร");
+
   }
 
   const duplicated = students.find((s) => s.email === email);
   if (duplicated) {
-    return res.status(409).json({
-      error: {
-        code: "DUPLICATE_EMAIL",
-        message: "อีเมลนี้มีอยู่ในระบบแล้ว",
-      },
-    });
+    return sendError(res, 409, "DUPLICATE_EMAIL", "อีเมลนี้มีอยู่ในระบบแล้ว");
+  
   }
 
   
   const checkStudent = students.find((s) => s.name === name);
   if (checkStudent) {
-    return res.status(409).json({ message: "นักศึกษาชื่อนี้มีอยู่แล้ว" });
+    return sendError(res, 409, "DUPLICATE_NAME", "นักศึกษาชื่อนี้มีอยู่แล้ว");
   }
 
   const newStudent = { id: nextId++, name, major, email };
@@ -108,12 +101,11 @@ router.put("/:id", (req, res) => {
   const student = students.find((s) => s.id === id);
 
   if (!student) {
-    return res.status(404).json({ message: "ไม่พบข้อมูลนักศึกษา" });
+    return sendError(res, 404, "STUDENT_NOT_FOUND", "ไม่พบข้อมูลนักศึกษา");
   }
 
   if (!name || !major) {
-    return res
-    .status(400).json({ message: "กรุณาระบุ major ให้ครบถ้วน" });
+    return sendError(res, 400, "VALIDATION_ERROR", "กรุณาระบุ major ให้ครบถ้วน");
   }
 
   /* ถ้ามีชื่อในidหนึ่ง แล้วจะเพิ่มชื่อเหมือนกัน จะขึ้นแจ้งเตือนว่ามีชื่อนี้แล้ว
@@ -125,7 +117,7 @@ router.put("/:id", (req, res) => {
   const checkStudent = students.find((s) => s.name === name && s.id !== id);
 
   if (checkStudent) {
-    return res.status(409).json({ message: "นักศึกษาชื่อนี้มีอยู่แล้ว" });
+    return sendError(res, 409, "DUPLICATE_NAME", "นักศึกษาชื่อนี้มีอยู่แล้ว");
   }
 
   student.name = name;
@@ -140,9 +132,7 @@ router.patch("/:id", (req, res) => {
   const student = students.find((s) => s.id === id);
 
   if(!student){
-    return res.status(404).json({
-      error: { code: "NOT_FOUND", message: "ไม่พบข้อมูลนักศึกษา"},
-    });
+    return sendError(res, 404, "STUDENT_NOT_FOUND", "ไม่พบข้อมูลนักศึกษา");
   }
 
   // อัปเดตเฉพาะฟิลด์ที่ส่งมา ฟิลด์อื่นคงค่าเดิมไว้
@@ -160,7 +150,7 @@ router.delete("/:id", (req, res) => {
   const index = students.findIndex((s) => s.id === id);
 
   if (index === -1) {
-    return res.status(404).json({ message: "ไม่พบข้อมูลนักศึกษา" });
+    return sendError(res, 404, "STUDENT_NOT_FOUND", "ไม่พบข้อมูลนักศึกษา");
   }
 
   students.splice(index, 1);

@@ -28,6 +28,7 @@ function resolveStudent(student) {
   return {
     ...student,
     courses: courses.filter((c) => student.courseIds.includes(c.id)),
+    // .map((c)) => resolveCourse(c)),
   };
 }
 
